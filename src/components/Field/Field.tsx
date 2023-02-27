@@ -160,6 +160,7 @@ function Field() {
           border="none"
           height="25px"
           width="26px"
+          onMouseDown={() => setEmotiIcon('-28px -25px')}
           onClick={resetGame}
         />
         <div>00</div>
@@ -183,10 +184,17 @@ function Field() {
                 height="17px"
                 width="17px"
                 onContextMenu={(e) => changeClosedCell(e, x, y)}
-                // onMouseDown={() => setEmotiIcon('-54px -25px')}
-                // setEmotiIcon('0px -25px')
-                // onMouseUp={(e) => console.log(e)}
-                onClick={() => openCell(x, y)}
+                onMouseDown={(e) => {
+                  if (e.button === 0 && !isLose && !isLose) {
+                    setEmotiIcon('-54px -25px');
+                  }
+                }}
+                onMouseUp={(e) => {
+                  if (!isLose && !isLose) {
+                    setEmotiIcon('0px -25px');
+                    openCell(x, y);
+                  }
+                }}
               >
                 {mask[y * fieldSize + x] === MaskCell.show &&
                 field[y * fieldSize + x] !== -1 &&
