@@ -26,10 +26,13 @@ function Field() {
   const fieldSize = 16;
   const dimension = new Array(fieldSize).fill(null);
 
-  const [isLose, setIsLose] = useState(false);
-  const [isWin, setIsWin] = useState(false);
   const [field, setField] = useState<number[]>(() => useCreateField(fieldSize));
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
+
+  const [emotiIcon, setEmotiIcon] = useState('0px -25px');
+
+  const [isLose, setIsLose] = useState(false);
+  const [isWin, setIsWin] = useState(false);
 
   useEffect(() => {
     const numberCells = field.filter((el) => el !== -1);
@@ -119,7 +122,20 @@ function Field() {
     setIsWin(false);
     setField(useCreateField(fieldSize));
     setMask(new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
+    setEmotiIcon('0px -25px');
   };
+
+  useEffect(() => {
+    if (isWin) {
+      setEmotiIcon('-81px -25px');
+    }
+  }, [isWin]);
+
+  useEffect(() => {
+    if (isLose) {
+      setEmotiIcon('-108px -25px');
+    }
+  }, [isWin]);
 
   return (
     <Box>
@@ -135,12 +151,11 @@ function Field() {
         <Button
           cursor="pointer"
           display="flex"
-          transition="all 0.5s ease"
           justifyContent="center"
           alignItems="center"
           backgroundImage={sprite}
           backgroundRepeat="no-repeat"
-          backgroundPosition="0px -25px"
+          backgroundPosition={emotiIcon}
           outline="none"
           border="none"
           height="25px"
@@ -167,8 +182,11 @@ function Field() {
                 border="none"
                 height="17px"
                 width="17px"
-                onClick={() => openCell(x, y)}
                 onContextMenu={(e) => changeClosedCell(e, x, y)}
+                // onMouseDown={() => setEmotiIcon('-54px -25px')}
+                // setEmotiIcon('0px -25px')
+                // onMouseUp={(e) => console.log(e)}
+                onClick={() => openCell(x, y)}
               >
                 {mask[y * fieldSize + x] === MaskCell.show &&
                 field[y * fieldSize + x] !== -1 &&
