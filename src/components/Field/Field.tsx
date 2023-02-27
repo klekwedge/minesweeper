@@ -28,7 +28,7 @@ function Field() {
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
 
   const openCell = (x: number, y: number) => {
-    if (!isLose || !isWin || mask[y * fieldSize + x] !== MaskCell.show) {
+    if (!isLose && !isWin && mask[y * fieldSize + x] !== 1) {
       setMask([
         ...mask.map((item, index) => {
           if (index === y * fieldSize + x) {
@@ -41,13 +41,12 @@ function Field() {
   };
 
   const changeClosedCell = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, x: number, y: number) => {
-    console.log('!');
     e.preventDefault();
     e.stopPropagation();
 
     let newMask: MaskCell;
 
-    if (!isWin || !isLose || mask[y * fieldSize + x] !== MaskCell.show) {
+    if (!isLose && !isWin && mask[y * fieldSize + x] !== 1) {
       if (mask[y * fieldSize + x] === MaskCell.hidden) {
         newMask = MaskCell.flag;
       } else if (mask[y * fieldSize + x] === MaskCell.flag) {
