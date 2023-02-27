@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Flex, Box, Button } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
-import sprite from '/public/minesweeper-sprites.png';
+import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
-
-// type cellType = 'hide' | 'show' | 'flag';
 
 enum MaskCell {
   hidden,
@@ -29,16 +27,18 @@ function Field() {
   const [field, setField] = useState<number[]>(() => useCreateField(fieldSize));
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
 
-  const cellClickHandler = (counter: number) => {
-    if (isLose || isWin) {
-      return null;
+  const openCell = (x: number, y: number) => {
+    if (!isLose || !isWin || mask[y * fieldSize + x] !== MaskCell.show) {
+      setMask([
+        ...mask.map((item, index) => {
+          if (index === y * fieldSize + x) {
+            return MaskCell.show;
+          }
+          return item;
+        }),
+      ]);
     }
-
-    return null;
   };
-
-  console.log(field);
-  console.log(mask);
 
   return (
     <Box border="5px solid #939393">
@@ -47,22 +47,24 @@ function Field() {
           {dimension.map((itemX, x) => (
             <Button
               cursor="pointer"
+              display="flex"
+              transition="all 0.5s ease"
+              justifyContent="center"
+              alignItems="center"
               key={uuidv4()}
               backgroundImage={sprite}
               backgroundRepeat="no-repeat"
-              backgroundPosition={
-                mask[y * fieldSize + x] !== MaskCell.show
-                  ? MaskCellType[mask[y * fieldSize + x]]
-                  : field[y * fieldSize + x]
-              }
+              backgroundPosition={MaskCellType[mask[y * fieldSize + x]]}
               outline="none"
               border="none"
               height="17px"
               width="17px"
+              onClick={() => openCell(x, y)}
             >
-              {/* {mask[y * fieldSize + x] !== MaskCell.show
-                ? mapMaskToView[mask[y * fieldSize + x]]
-                : field[y * fieldSize + x]} */}
+              {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] === -1 ? '💣' : ''}
+              {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] !== -1
+                ? field[y * fieldSize + x]
+                : ''}
             </Button>
           ))}
         </Flex>
