@@ -13,9 +13,9 @@ enum MaskCell {
 
 const MaskCellType = {
   [MaskCell.hidden]: '0px -50px',
-  [MaskCell.show]: '-16px -50px',
+  [MaskCell.show]: '-17px -50px',
   [MaskCell.flag]: '-34px -50px',
-  [MaskCell.question]: '-50px -50px',
+  [MaskCell.question]: '-51px -50px',
 };
 
 function Field() {
@@ -33,6 +33,33 @@ function Field() {
         ...mask.map((item, index) => {
           if (index === y * fieldSize + x) {
             return MaskCell.show;
+          }
+          return item;
+        }),
+      ]);
+    }
+  };
+
+  const changeClosedCell = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, x: number, y: number) => {
+    console.log('!');
+    e.preventDefault();
+    e.stopPropagation();
+
+    let newMask: MaskCell;
+
+    if (!isWin || !isLose || mask[y * fieldSize + x] !== MaskCell.show) {
+      if (mask[y * fieldSize + x] === MaskCell.hidden) {
+        newMask = MaskCell.flag;
+      } else if (mask[y * fieldSize + x] === MaskCell.flag) {
+        newMask = MaskCell.question;
+      } else if (mask[y * fieldSize + x] === MaskCell.question) {
+        newMask = MaskCell.hidden;
+      }
+
+      setMask([
+        ...mask.map((item, index) => {
+          if (index === y * fieldSize + x) {
+            return newMask;
           }
           return item;
         }),
@@ -60,6 +87,7 @@ function Field() {
               height="17px"
               width="17px"
               onClick={() => openCell(x, y)}
+              onContextMenu={(e) => changeClosedCell(e, x, y)}
             >
               {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] === -1 ? '💣' : ''}
               {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] !== -1
