@@ -23,7 +23,7 @@ const MaskCellType = {
 };
 
 function Field() {
-  const fieldSize = 3;
+  const fieldSize = 16;
   const dimension = new Array(fieldSize).fill(null);
 
   const [isLose, setIsLose] = useState(false);
@@ -32,7 +32,6 @@ function Field() {
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
 
   useEffect(() => {
-    console.log(field);
     const numberCells = field.filter((el) => el !== -1);
     const openCells = mask.filter((el) => el === 1);
 
@@ -115,38 +114,72 @@ function Field() {
     }
   };
 
+  const resetGame = () => {
+    setIsLose(false);
+    setIsWin(false);
+    setField(useCreateField(fieldSize));
+    setMask(new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
+  };
+
   return (
-    <Box border="5px solid #939393" transition="all 0.5s ease">
-      {dimension.map((itemY, y) => (
-        <Flex flexWrap="wrap" key={uuidv4()} style={{ display: 'flex' }} transition="all 0.5s ease">
-          {dimension.map((itemX, x) => (
-            <Button
-              cursor="pointer"
-              display="flex"
-              transition="all 0.5s ease"
-              justifyContent="center"
-              alignItems="center"
-              key={uuidv4()}
-              backgroundImage={sprite}
-              backgroundColor={isWin ? 'red' : ''}
-              backgroundRepeat="no-repeat"
-              backgroundPosition={MaskCellType[mask[y * fieldSize + x]]}
-              outline="none"
-              border="none"
-              height="17px"
-              width="17px"
-              onClick={() => openCell(x, y)}
-              onContextMenu={(e) => changeClosedCell(e, x, y)}
-            >
-              {mask[y * fieldSize + x] === MaskCell.show &&
-              field[y * fieldSize + x] !== -1 &&
-              field[y * fieldSize + x] !== 0
-                ? field[y * fieldSize + x]
-                : ''}
-            </Button>
-          ))}
-        </Flex>
-      ))}
+    <Box>
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        p="5px 10px"
+        w="252px"
+        border="5px solid #939393"
+        backgroundColor="#BDBDBD"
+      >
+        <div>40</div>
+        <Button
+          cursor="pointer"
+          display="flex"
+          transition="all 0.5s ease"
+          justifyContent="center"
+          alignItems="center"
+          backgroundImage={sprite}
+          backgroundRepeat="no-repeat"
+          backgroundPosition="0px -25px"
+          outline="none"
+          border="none"
+          height="25px"
+          width="26px"
+          onClick={resetGame}
+        />
+        <div>00</div>
+      </Flex>
+      <Box border="5px solid #939393" transition="all 0.5s ease">
+        {dimension.map((itemY, y) => (
+          <Flex flexWrap="wrap" key={uuidv4()} style={{ display: 'flex' }} transition="all 0.5s ease">
+            {dimension.map((itemX, x) => (
+              <Button
+                cursor="pointer"
+                display="flex"
+                transition="all 0.5s ease"
+                justifyContent="center"
+                alignItems="center"
+                key={uuidv4()}
+                backgroundImage={sprite}
+                backgroundRepeat="no-repeat"
+                backgroundPosition={MaskCellType[mask[y * fieldSize + x]]}
+                outline="none"
+                border="none"
+                height="17px"
+                width="17px"
+                onClick={() => openCell(x, y)}
+                onContextMenu={(e) => changeClosedCell(e, x, y)}
+              >
+                {mask[y * fieldSize + x] === MaskCell.show &&
+                field[y * fieldSize + x] !== -1 &&
+                field[y * fieldSize + x] !== 0
+                  ? field[y * fieldSize + x]
+                  : ''}
+              </Button>
+            ))}
+          </Flex>
+        ))}
+      </Box>
     </Box>
   );
 }
