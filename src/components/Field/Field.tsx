@@ -3,6 +3,7 @@ import { Flex, Box, Button, Image } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
+import useTimer from '../../hooks/useTimer';
 
 enum MaskCell {
   hidden,
@@ -32,7 +33,7 @@ function Field() {
   const [emotiIcon, setEmotiIcon] = useState('0px -25px');
   const [minutesIcon, setMinutesIcon] = useState<string[]>(['-42px 0px', '-126px 0px']);
   const [secondsIcon, setSecondsIcon] = useState<string[]>(['-126px 0px', '-126px 0px']);
-  
+
   const [isLose, setIsLose] = useState(false);
   const [isWin, setIsWin] = useState(false);
 
@@ -152,6 +153,7 @@ function Field() {
         <Flex>
           {minutesIcon.map((pos) => (
             <Image
+              key={uuidv4()}
               display="flex"
               justifyContent="center"
               alignItems="center"
@@ -178,9 +180,10 @@ function Field() {
           onMouseDown={() => setEmotiIcon('-28px -25px')}
           onClick={resetGame}
         />
-       <Flex>
+        <Flex>
           {secondsIcon.map((pos) => (
             <Image
+              key={uuidv4()}
               display="flex"
               justifyContent="center"
               alignItems="center"
