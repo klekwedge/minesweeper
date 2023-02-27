@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Flex, Box, Button, Image } from '@chakra-ui/react';
+import { Heading, Flex, Box, Button, Image } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
 import useTimer from '../../hooks/useTimer';
@@ -33,6 +34,47 @@ function Field() {
   const [emotiIcon, setEmotiIcon] = useState('0px -25px');
   const [minutesIcon, setMinutesIcon] = useState<string[]>(['-42px 0px', '-126px 0px']);
   const [secondsIcon, setSecondsIcon] = useState<string[]>(['-126px 0px', '-126px 0px']);
+
+  let timerId: number | null = null;
+
+  const [timeLeft, setTimeLeft] = useState(40 * 60);
+
+//   console.log('!');
+
+  useEffect(() => {
+    // console.log(timeLeft);
+    if (timeLeft >= 0) {
+      const minutes = Math.floor(timeLeft / 60);
+      const newTimerMinutes = [useTimer(Math.floor(minutes / 10)), useTimer(minutes % 10)];
+      setMinutesIcon(newTimerMinutes);
+
+      const seconds = timeLeft % 60;
+      const newTimerSeconds = [useTimer(Math.floor(seconds / 10)), useTimer(seconds % 10)];
+      setSecondsIcon(newTimerSeconds);
+    }
+  }, [timeLeft]);
+
+  const clearTimerId = () => {
+    if (timerId) {
+      clearInterval(timerId);
+    }
+    timerId = null;
+  };
+
+  const countdownTimer = () => {
+    if (timeLeft > 0) {
+      setTimeLeft((prev) => prev - 1);
+    }
+
+    if (timeLeft <= 0) {
+      clearTimerId();
+    }
+  };
+
+  useEffect(() => {
+    timerId = setInterval(countdownTimer, 1000);
+    return () => clearTimerId();
+  }, []);
 
   const [isLose, setIsLose] = useState(false);
   const [isWin, setIsWin] = useState(false);
