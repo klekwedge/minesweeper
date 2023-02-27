@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Flex, Box, Button } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
-import sprite from '/minesweeper-sprites.png';
+import sprite from '/public/minesweeper-sprites.png'
 import useCreateField from '../../hooks/useCreateField';
 
 enum MaskCell {
@@ -9,6 +9,8 @@ enum MaskCell {
   show,
   flag,
   question,
+  bomb,
+  explosion
 }
 
 const MaskCellType = {
@@ -16,6 +18,8 @@ const MaskCellType = {
   [MaskCell.show]: '-17px -50px',
   [MaskCell.flag]: '-34px -50px',
   [MaskCell.question]: '-51px -50px',
+  [MaskCell.bomb]: '-85px -50px',
+  [MaskCell.explosion]: '-102px -50px',
 };
 
 function Field() {
@@ -29,14 +33,32 @@ function Field() {
 
   const openCell = (x: number, y: number) => {
     if (!isLose && !isWin && mask[y * fieldSize + x] !== 1) {
-      setMask([
-        ...mask.map((item, index) => {
-          if (index === y * fieldSize + x) {
+      if (field[y * fieldSize + x] === -1) {
+        setMask([
+          ...mask.map((item, index) => {
+            console.log(item);
+            if (index === y * fieldSize + x) {
+              return MaskCell.explosion;
+            }
+            if (field[index] === -1) {
+              return MaskCell.bomb;
+            }
             return MaskCell.show;
-          }
-          return item;
-        }),
-      ]);
+          }),
+        ]);
+        // setMask([...mask.map((item) => MaskCell.show)]);
+
+        setIsLose(true);
+      } else {
+        setMask([
+          ...mask.map((item, index) => {
+            if (index === y * fieldSize + x) {
+              return MaskCell.show;
+            }
+            return item;
+          }),
+        ]);
+      }
     }
   };
 
@@ -67,9 +89,9 @@ function Field() {
   };
 
   return (
-    <Box border="5px solid #939393">
+    <Box border="5px solid #939393" transition="all 0.5s ease">
       {dimension.map((itemY, y) => (
-        <Flex flexWrap="wrap" key={uuidv4()} style={{ display: 'flex' }}>
+        <Flex flexWrap="wrap" key={uuidv4()} style={{ display: 'flex' }} transition="all 0.5s ease">
           {dimension.map((itemX, x) => (
             <Button
               cursor="pointer"
@@ -88,7 +110,7 @@ function Field() {
               onClick={() => openCell(x, y)}
               onContextMenu={(e) => changeClosedCell(e, x, y)}
             >
-              {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] === -1 ? '💣' : ''}
+              {/* {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] === -1 ? '💣' : ''} */}
               {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] !== -1
                 ? field[y * fieldSize + x]
                 : ''}
