@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Flex, Box, Button } from '@chakra-ui/react';
+import { Flex, Box, Button, Image } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
@@ -30,7 +30,9 @@ function Field() {
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
 
   const [emotiIcon, setEmotiIcon] = useState('0px -25px');
-
+  const [minutesIcon, setMinutesIcon] = useState<string[]>(['-42px 0px', '-126px 0px']);
+  const [secondsIcon, setSecondsIcon] = useState<string[]>(['-126px 0px', '-126px 0px']);
+  
   const [isLose, setIsLose] = useState(false);
   const [isWin, setIsWin] = useState(false);
 
@@ -147,7 +149,20 @@ function Field() {
         border="5px solid #939393"
         backgroundColor="#BDBDBD"
       >
-        <div>40</div>
+        <Flex>
+          {minutesIcon.map((pos) => (
+            <Image
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              backgroundImage={sprite}
+              backgroundRepeat="no-repeat"
+              backgroundPosition={pos}
+              height="25px"
+              width="13px"
+            />
+          ))}
+        </Flex>
         <Button
           cursor="pointer"
           display="flex"
@@ -163,7 +178,20 @@ function Field() {
           onMouseDown={() => setEmotiIcon('-28px -25px')}
           onClick={resetGame}
         />
-        <div>00</div>
+       <Flex>
+          {secondsIcon.map((pos) => (
+            <Image
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              backgroundImage={sprite}
+              backgroundRepeat="no-repeat"
+              backgroundPosition={pos}
+              height="25px"
+              width="13px"
+            />
+          ))}
+        </Flex>
       </Flex>
       <Box border="5px solid #939393" transition="all 0.5s ease">
         {dimension.map((itemY, y) => (
@@ -190,7 +218,7 @@ function Field() {
                   }
                 }}
                 onMouseUp={(e) => {
-                  if (!isLose && !isLose) {
+                  if (e.button === 0 && !isLose && !isLose) {
                     setEmotiIcon('0px -25px');
                     openCell(x, y);
                   }
