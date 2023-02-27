@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Flex, Box, Button } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
-import sprite from '/public/minesweeper-sprites.png'
+import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
 
 enum MaskCell {
@@ -10,7 +10,7 @@ enum MaskCell {
   flag,
   question,
   bomb,
-  explosion
+  explosion,
 }
 
 const MaskCellType = {
@@ -32,11 +32,38 @@ function Field() {
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
 
   const openCell = (x: number, y: number) => {
+    const clearing: [number, number][] = [];
+    const newMaskState = JSON.parse(JSON.stringify(mask));
+
+    function clear(xCoord: number, yCoord: number) {
+      if (xCoord >= 0 && xCoord < fieldSize && yCoord >= 0 && yCoord < fieldSize) {
+        if (newMaskState[yCoord * fieldSize + xCoord] !== MaskCell.show) {
+          clearing.push([xCoord, yCoord]);
+        }
+      }
+    }
+
     if (!isLose && !isWin && mask[y * fieldSize + x] !== 1) {
-      if (field[y * fieldSize + x] === -1) {
+      if (field[y * fieldSize + x] !== -1) {
+        clear(x, y);
+
+        while (clearing.length) {
+          const [xCoord, yCoord] = clearing.pop()!;
+
+          newMaskState[yCoord * fieldSize + xCoord] = MaskCell.show;
+
+          if (field[yCoord * fieldSize + xCoord] === 0) {
+            clear(xCoord + 1, yCoord);
+            clear(xCoord - 1, yCoord);
+            clear(xCoord, yCoord + 1);
+            clear(xCoord, yCoord - 1);
+          }
+        }
+
+        setMask(newMaskState);
+      } else {
         setMask([
           ...mask.map((item, index) => {
-            console.log(item);
             if (index === y * fieldSize + x) {
               return MaskCell.explosion;
             }
@@ -46,18 +73,8 @@ function Field() {
             return MaskCell.show;
           }),
         ]);
-        // setMask([...mask.map((item) => MaskCell.show)]);
 
         setIsLose(true);
-      } else {
-        setMask([
-          ...mask.map((item, index) => {
-            if (index === y * fieldSize + x) {
-              return MaskCell.show;
-            }
-            return item;
-          }),
-        ]);
       }
     }
   };
@@ -110,8 +127,9 @@ function Field() {
               onClick={() => openCell(x, y)}
               onContextMenu={(e) => changeClosedCell(e, x, y)}
             >
-              {/* {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] === -1 ? '💣' : ''} */}
-              {mask[y * fieldSize + x] === MaskCell.show && field[y * fieldSize + x] !== -1
+              {mask[y * fieldSize + x] === MaskCell.show &&
+              field[y * fieldSize + x] !== -1 &&
+              field[y * fieldSize + x] !== 0
                 ? field[y * fieldSize + x]
                 : ''}
             </Button>
