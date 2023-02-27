@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Flex, Box, Button } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import sprite from '/minesweeper-sprites.png';
@@ -23,13 +23,23 @@ const MaskCellType = {
 };
 
 function Field() {
-  const fieldSize = 16;
+  const fieldSize = 3;
   const dimension = new Array(fieldSize).fill(null);
 
   const [isLose, setIsLose] = useState(false);
   const [isWin, setIsWin] = useState(false);
   const [field, setField] = useState<number[]>(() => useCreateField(fieldSize));
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
+
+  useEffect(() => {
+    console.log(field);
+    const numberCells = field.filter((el) => el !== -1);
+    const openCells = mask.filter((el) => el === 1);
+
+    if (numberCells.every((el, i) => openCells[i] === MaskCell.show)) {
+      setIsWin(true);
+    }
+  }, [field, mask]);
 
   const openCell = (x: number, y: number) => {
     const clearing: [number, number][] = [];
@@ -118,6 +128,7 @@ function Field() {
               alignItems="center"
               key={uuidv4()}
               backgroundImage={sprite}
+              backgroundColor={isWin ? 'red' : ''}
               backgroundRepeat="no-repeat"
               backgroundPosition={MaskCellType[mask[y * fieldSize + x]]}
               outline="none"
