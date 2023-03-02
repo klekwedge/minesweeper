@@ -35,9 +35,12 @@ function Field() {
   const [minutesIcon, setMinutesIcon] = useState<string[]>(['-42px 0px', '-126px 0px']);
   const [secondsIcon, setSecondsIcon] = useState<string[]>(['-126px 0px', '-126px 0px']);
 
+  const [isLose, setIsLose] = useState(false);
+  const [isWin, setIsWin] = useState(false);
+
   const timerId = useRef<number | null>(null);
   // const [timeLeft, setTimeLeft] = useState(2400);
-  const [timeLeft, setTimeLeft] = useState(1);
+  const [timeLeft, setTimeLeft] = useState(60);
 
   const clearTimerId = () => {
     if (timerId.current) {
@@ -45,6 +48,18 @@ function Field() {
     }
     timerId.current = null;
   };
+
+  function showAllCells() {
+    setMask([
+      ...mask.map((item, index) => {
+        if (field[index] === -1) {
+          return MaskCell.bomb;
+        }
+        return MaskCell.show;
+      }),
+    ]);
+    clearTimerId();
+  }
 
   useEffect(() => {
     if (timeLeft >= 0) {
@@ -56,8 +71,10 @@ function Field() {
       const newTimerSeconds = [useTimer(Math.floor(seconds / 10)), useTimer(seconds % 10)];
       setSecondsIcon(newTimerSeconds);
     } else {
-      setEmotiIcon('-108px -25px');
-      clearTimerId();
+      if (!isWin) {
+        setEmotiIcon('-108px -25px');
+      }
+      showAllCells();
     }
   }, [timeLeft]);
 
@@ -66,29 +83,25 @@ function Field() {
     return () => clearTimerId();
   }, []);
 
-  const [isLose, setIsLose] = useState(false);
-  const [isWin, setIsWin] = useState(false);
-
   useEffect(() => {
     if (isLose) {
       setEmotiIcon('-108px -25px');
     }
   }, [isLose]);
 
-  // useEffect(() => {
-  //   // if (isWin) {
-  //   //   setEmotiIcon('-81px -25px');
-  //   // }
-  // }, [isWin]);
+  useEffect(() => {
+    if (isWin) {
+      setEmotiIcon('-81px -25px');
+    }
+  }, [isWin]);
 
   useEffect(() => {
-    // console.log(field);
-    // console.log(isWin);
     const numberCells = field.filter((el) => el !== -1);
     const openCells = mask.filter((el) => el === 1);
 
-    if (numberCells.every((el, i) => openCells[i] === MaskCell.show)) {
+    if (!isLose && timeLeft >= 0 && numberCells.every((el, i) => openCells[i] === MaskCell.show)) {
       setIsWin(true);
+      showAllCells();
     }
   }, [field, mask]);
 
@@ -136,6 +149,7 @@ function Field() {
         ]);
 
         setIsLose(true);
+        clearTimerId();
       }
     }
   };
@@ -250,12 +264,12 @@ function Field() {
                 width="17px"
                 onContextMenu={(e) => changeClosedCell(e, x, y)}
                 onMouseDown={(e) => {
-                  if (e.button === 0 && !isLose && !isLose) {
+                  if (e.button === 0 && !isLose && !isWin) {
                     setEmotiIcon('-54px -25px');
                   }
                 }}
                 onMouseUp={(e) => {
-                  if (e.button === 0 && !isLose && !isLose) {
+                  if (e.button === 0 && !isLose && !isWin) {
                     setEmotiIcon('0px -25px');
                     openCell(x, y);
                   }
