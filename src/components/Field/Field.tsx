@@ -5,7 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
 import useTimer from '../../hooks/useTimer';
-import { MaskCell, MaskCellType } from '../../types';
+import { MaskCell, MaskCellType } from '../../types/types';
+import useNumberCell from '../../hooks/useNumberCell';
 
 function Field() {
   const fieldSize = 16;
@@ -95,6 +96,15 @@ function Field() {
         while (clearing.length) {
           const [xCoord, yCoord] = clearing.pop()!;
 
+          // console.log(newMaskState);
+          // console.log(field[yCoord * fieldSize + xCoord]);
+          // newMaskState[yCoord * fieldSize + xCoord] = field[yCoord * fieldSize + xCoord];
+          console.log(field[yCoord * fieldSize + xCoord]);
+          // if (field[yCoord * fieldSize + xCoord] === 0) {
+          //   newMaskState[yCoord * fieldSize + xCoord] = MaskCell.show;
+          // } else {
+          //   newMaskState[yCoord * fieldSize + xCoord] = field[yCoord * fieldSize + xCoord];
+          // }
           newMaskState[yCoord * fieldSize + xCoord] = MaskCell.show;
 
           if (field[yCoord * fieldSize + xCoord] === 0) {
@@ -234,7 +244,8 @@ function Field() {
                 width="17px"
                 onContextMenu={(e) => changeClosedCell(e, x, y)}
                 onMouseDown={(e) => {
-                  if (e.button === 0 && !isLose && !isWin && timeLeft >= 0) {
+                  // console.log(mask[y * fieldSize + x]);
+                  if (mask[y * fieldSize + x] !== 1 && e.button === 0 && !isLose && !isWin && timeLeft >= 0) {
                     setEmotiIcon('-54px -25px');
                   }
                 }}
@@ -244,13 +255,7 @@ function Field() {
                     openCell(x, y);
                   }
                 }}
-              >
-                {mask[y * fieldSize + x] === MaskCell.show &&
-                field[y * fieldSize + x] !== -1 &&
-                field[y * fieldSize + x] !== 0
-                  ? field[y * fieldSize + x]
-                  : ''}
-              </Button>
+              />
             ))}
           </Flex>
         ))}
