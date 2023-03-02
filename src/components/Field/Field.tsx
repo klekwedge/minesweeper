@@ -10,7 +10,6 @@ function Field() {
   const fieldSize = 16;
   const dimension = new Array(fieldSize).fill(null);
 
-  // const [field, setField] = useState<number[]>(() => useCreateField(fieldSize));
   const [field, setField] = useState<number[]>([]);
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
 
@@ -61,11 +60,6 @@ function Field() {
       showAllCells();
     }
   }, [timeLeft]);
-
-  useEffect(() => {
-    timerId.current = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-    return () => clearTimerId();
-  }, []);
 
   useEffect(() => {
     const numberCells = field.filter((el) => el !== -1);
@@ -142,8 +136,8 @@ function Field() {
 
   useEffect(() => {
     if (!isFirstMove && firstIndex) {
-      // console.log(firstIndex);
       openCell(firstIndex.x, firstIndex.y);
+      timerId.current = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     }
   }, [firstIndex]);
 
@@ -176,7 +170,6 @@ function Field() {
   const resetGame = () => {
     clearTimerId();
     setTimeLeft(2400);
-    timerId.current = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     setIsLose(false);
     setIsWin(false);
     setField([]);
