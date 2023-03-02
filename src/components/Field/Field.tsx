@@ -8,7 +8,7 @@ import useTimer from '../../hooks/useTimer';
 import { MaskCell, MaskCellType } from '../../types';
 
 function Field() {
-  const fieldSize = 2;
+  const fieldSize = 16;
   const dimension = new Array(fieldSize).fill(null);
 
   const [field, setField] = useState<number[]>(() => useCreateField(fieldSize));
@@ -22,7 +22,6 @@ function Field() {
   const [isWin, setIsWin] = useState(false);
 
   const timerId = useRef<number | null>(null);
-  // const [timeLeft, setTimeLeft] = useState(2400);
   const [timeLeft, setTimeLeft] = useState(2400);
 
   const clearTimerId = () => {
@@ -65,8 +64,6 @@ function Field() {
     timerId.current = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     return () => clearTimerId();
   }, []);
-
-  // console.log(field);
 
   useEffect(() => {
     const numberCells = field.filter((el) => el !== -1);
@@ -135,7 +132,7 @@ function Field() {
 
     let newMask: MaskCell;
 
-    if (!isLose && !isWin && mask[y * fieldSize + x] !== 1) {
+    if (timeLeft >= 0 && !isLose && !isWin && mask[y * fieldSize + x] !== 1) {
       if (mask[y * fieldSize + x] === MaskCell.hidden) {
         newMask = MaskCell.flag;
       } else if (mask[y * fieldSize + x] === MaskCell.flag) {
@@ -171,7 +168,7 @@ function Field() {
         justifyContent="space-between"
         alignItems="center"
         p="5px 10px"
-        w="252px"
+        w="282px"
         border="5px solid #939393"
         backgroundColor="#BDBDBD"
       >
@@ -198,8 +195,6 @@ function Field() {
           backgroundImage={sprite}
           backgroundRepeat="no-repeat"
           backgroundPosition={emotiIcon}
-          outline="none"
-          border="none"
           height="25px"
           width="26px"
           onMouseDown={() => setEmotiIcon('-28px -25px')}
@@ -235,18 +230,16 @@ function Field() {
                 backgroundImage={sprite}
                 backgroundRepeat="no-repeat"
                 backgroundPosition={MaskCellType[mask[y * fieldSize + x]]}
-                outline="none"
-                border="none"
                 height="17px"
                 width="17px"
                 onContextMenu={(e) => changeClosedCell(e, x, y)}
                 onMouseDown={(e) => {
-                  if (e.button === 0 && !isLose && !isWin) {
+                  if (e.button === 0 && !isLose && !isWin && timeLeft >= 0) {
                     setEmotiIcon('-54px -25px');
                   }
                 }}
                 onMouseUp={(e) => {
-                  if (e.button === 0 && !isLose && !isWin) {
+                  if (e.button === 0 && !isLose && !isWin && timeLeft >= 0) {
                     setEmotiIcon('0px -25px');
                     openCell(x, y);
                   }
