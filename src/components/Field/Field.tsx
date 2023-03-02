@@ -154,6 +154,7 @@ function Field() {
   };
 
   const resetGame = () => {
+    clearTimerId();
     setTimeLeft(2400);
     timerId.current = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     setIsLose(false);
@@ -255,7 +256,7 @@ function Field() {
                     width="17px"
                     backgroundImage={sprite}
                     backgroundRepeat="no-repeat"
-                    backgroundPosition={numbers[field[y * fieldSize + x]-1]}
+                    backgroundPosition={numbers[field[y * fieldSize + x] - 1]}
                   />
                 ) : (
                   ''
