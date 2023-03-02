@@ -181,6 +181,8 @@ function Field() {
   };
 
   const resetGame = () => {
+    setTimeLeft(40 * 60);
+    timerId.current = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     setIsLose(false);
     setIsWin(false);
     setField(useCreateField(fieldSize));
