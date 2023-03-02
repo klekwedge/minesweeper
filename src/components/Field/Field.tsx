@@ -1,7 +1,7 @@
+/* eslint-disable import/no-absolute-path */
 import { useState, useEffect, useRef } from 'react';
 import { Flex, Box, Button, Image } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
-import dayjs from 'dayjs';
 import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
 import useTimer from '../../hooks/useTimer';
@@ -25,7 +25,7 @@ const MaskCellType = {
 };
 
 function Field() {
-  const fieldSize = 16;
+  const fieldSize = 2;
   const dimension = new Array(fieldSize).fill(null);
 
   const [field, setField] = useState<number[]>(() => useCreateField(fieldSize));
@@ -36,7 +36,8 @@ function Field() {
   const [secondsIcon, setSecondsIcon] = useState<string[]>(['-126px 0px', '-126px 0px']);
 
   const timerId = useRef<number | null>(null);
-  const [timeLeft, setTimeLeft] = useState(2400);
+  // const [timeLeft, setTimeLeft] = useState(2400);
+  const [timeLeft, setTimeLeft] = useState(1);
 
   const clearTimerId = () => {
     if (timerId.current) {
@@ -55,6 +56,7 @@ function Field() {
       const newTimerSeconds = [useTimer(Math.floor(seconds / 10)), useTimer(seconds % 10)];
       setSecondsIcon(newTimerSeconds);
     } else {
+      setEmotiIcon('-108px -25px');
       clearTimerId();
     }
   }, [timeLeft]);
@@ -68,6 +70,20 @@ function Field() {
   const [isWin, setIsWin] = useState(false);
 
   useEffect(() => {
+    if (isLose) {
+      setEmotiIcon('-108px -25px');
+    }
+  }, [isLose]);
+
+  // useEffect(() => {
+  //   // if (isWin) {
+  //   //   setEmotiIcon('-81px -25px');
+  //   // }
+  // }, [isWin]);
+
+  useEffect(() => {
+    // console.log(field);
+    // console.log(isWin);
     const numberCells = field.filter((el) => el !== -1);
     const openCells = mask.filter((el) => el === 1);
 
@@ -157,18 +173,6 @@ function Field() {
     setMask(new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
     setEmotiIcon('0px -25px');
   };
-
-  useEffect(() => {
-    if (isWin) {
-      setEmotiIcon('-81px -25px');
-    }
-  }, [isWin]);
-
-  useEffect(() => {
-    if (isLose) {
-      setEmotiIcon('-108px -25px');
-    }
-  }, [isWin]);
 
   return (
     <Box>
