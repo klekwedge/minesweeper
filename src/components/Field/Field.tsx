@@ -148,7 +148,9 @@ function Field() {
     let newMask: MaskCell;
 
     if (timeLeft >= 0 && !isLose && !isWin && mask[y * fieldSize + x] !== 1) {
-      if (mask[y * fieldSize + x] === MaskCell.hidden) {
+      const flags = mask.filter((item) => item === 2);
+
+      if (mask[y * fieldSize + x] === MaskCell.hidden && flags.length < fieldSize) {
         newMask = MaskCell.flag;
       } else if (mask[y * fieldSize + x] === MaskCell.flag) {
         newMask = MaskCell.question;
@@ -158,7 +160,7 @@ function Field() {
 
       setMask([
         ...mask.map((item, index) => {
-          if (index === y * fieldSize + x) {
+          if (newMask !== undefined && index === y * fieldSize + x) {
             return newMask;
           }
           return item;
