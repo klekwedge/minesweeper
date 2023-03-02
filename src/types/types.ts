@@ -26,7 +26,7 @@ export const timer = [
   '-70px 0px',
   '-85px 0px',
   '-98px 0px',
-  '-112px 0px'
+  '-112px 0px',
 ];
 
 export const numbers = [
@@ -39,3 +39,8 @@ export const numbers = [
   '-103px -67px',
   '-119px -67px',
 ];
+
+export type FirstIndexType = {
+  x: number;
+  y: number;
+};

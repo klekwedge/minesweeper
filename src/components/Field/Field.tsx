@@ -4,13 +4,14 @@ import { Flex, Box, Button, Image, Text } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
-import { MaskCell, MaskCellType, numbers, timer } from '../../types/types';
+import { FirstIndexType, MaskCell, MaskCellType, numbers, timer } from '../../types/types';
 
 function Field() {
   const fieldSize = 16;
   const dimension = new Array(fieldSize).fill(null);
 
-  const [field, setField] = useState<number[]>(() => useCreateField(fieldSize));
+  // const [field, setField] = useState<number[]>(() => useCreateField(fieldSize));
+  const [field, setField] = useState<number[]>([]);
   const [mask, setMask] = useState<MaskCell[]>(() => new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
 
   const [emotiIcon, setEmotiIcon] = useState('0px -25px');
@@ -19,6 +20,8 @@ function Field() {
 
   const [isLose, setIsLose] = useState(false);
   const [isWin, setIsWin] = useState(false);
+  const [isFirstMove, setIsFirstMove] = useState(true);
+  const [firstIndex, setFirstIndex] = useState<FirstIndexType>();
 
   const timerId = useRef<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(2400);
@@ -64,13 +67,17 @@ function Field() {
     return () => clearTimerId();
   }, []);
 
-  // console.log('!');
-
   useEffect(() => {
     const numberCells = field.filter((el) => el !== -1);
     const openCells = mask.filter((el) => el === 1);
 
-    if (!isWin && !isLose && timeLeft >= 0 && numberCells.every((el, i) => openCells[i] === MaskCell.show)) {
+    if (
+      !isFirstMove &&
+      !isWin &&
+      !isLose &&
+      timeLeft >= 0 &&
+      numberCells.every((el, i) => openCells[i] === MaskCell.show)
+    ) {
       setIsWin(true);
       showAllCells();
       setEmotiIcon('-81px -25px');
@@ -81,6 +88,13 @@ function Field() {
     const clearingCells: [number, number][] = [];
     const newMaskState = JSON.parse(JSON.stringify(mask));
 
+    if (isFirstMove) {
+      const firstCell = y * fieldSize + x;
+      setField(useCreateField(firstCell, fieldSize));
+      setIsFirstMove(false);
+      setFirstIndex({ x, y });
+    }
+
     function clearCells(xCoord: number, yCoord: number) {
       if (xCoord >= 0 && xCoord < fieldSize && yCoord >= 0 && yCoord < fieldSize) {
         if (newMaskState[yCoord * fieldSize + xCoord] !== MaskCell.show) {
@@ -89,7 +103,7 @@ function Field() {
       }
     }
 
-    if (!isLose && !isWin && mask[y * fieldSize + x] !== 1) {
+    if (!isFirstMove && !isLose && !isWin && mask[y * fieldSize + x] !== 1) {
       if (field[y * fieldSize + x] !== -1) {
         clearCells(x, y);
 
@@ -126,6 +140,13 @@ function Field() {
     }
   };
 
+  useEffect(() => {
+    if (!isFirstMove && firstIndex) {
+      // console.log(firstIndex);
+      openCell(firstIndex.x, firstIndex.y);
+    }
+  }, [firstIndex]);
+
   const changeClosedCell = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, x: number, y: number) => {
     e.preventDefault();
     e.stopPropagation();
@@ -158,7 +179,9 @@ function Field() {
     timerId.current = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     setIsLose(false);
     setIsWin(false);
-    setField(useCreateField(fieldSize));
+    setField([]);
+    setFirstIndex(undefined);
+    setIsFirstMove(true);
     setMask(new Array(fieldSize * fieldSize).fill(MaskCell.hidden));
     setEmotiIcon('0px -25px');
   };
