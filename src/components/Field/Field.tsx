@@ -5,24 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
 import useTimer from '../../hooks/useTimer';
-
-enum MaskCell {
-  hidden,
-  show,
-  flag,
-  question,
-  bomb,
-  explosion,
-}
-
-const MaskCellType = {
-  [MaskCell.hidden]: '0px -50px',
-  [MaskCell.show]: '-17px -50px',
-  [MaskCell.flag]: '-34px -50px',
-  [MaskCell.question]: '-51px -50px',
-  [MaskCell.bomb]: '-85px -50px',
-  [MaskCell.explosion]: '-102px -50px',
-};
+import { MaskCell, MaskCellType } from '../../types';
 
 function Field() {
   const fieldSize = 2;
@@ -40,7 +23,7 @@ function Field() {
 
   const timerId = useRef<number | null>(null);
   // const [timeLeft, setTimeLeft] = useState(2400);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(2400);
 
   const clearTimerId = () => {
     if (timerId.current) {
@@ -83,25 +66,16 @@ function Field() {
     return () => clearTimerId();
   }, []);
 
-  useEffect(() => {
-    if (isLose) {
-      setEmotiIcon('-108px -25px');
-    }
-  }, [isLose]);
-
-  useEffect(() => {
-    if (isWin) {
-      setEmotiIcon('-81px -25px');
-    }
-  }, [isWin]);
+  // console.log(field);
 
   useEffect(() => {
     const numberCells = field.filter((el) => el !== -1);
     const openCells = mask.filter((el) => el === 1);
 
-    if (!isLose && timeLeft >= 0 && numberCells.every((el, i) => openCells[i] === MaskCell.show)) {
+    if (!isWin && !isLose && timeLeft >= 0 && numberCells.every((el, i) => openCells[i] === MaskCell.show)) {
       setIsWin(true);
       showAllCells();
+      setEmotiIcon('-81px -25px');
     }
   }, [field, mask]);
 
@@ -149,6 +123,7 @@ function Field() {
         ]);
 
         setIsLose(true);
+        setEmotiIcon('-108px -25px');
         clearTimerId();
       }
     }
@@ -181,7 +156,7 @@ function Field() {
   };
 
   const resetGame = () => {
-    setTimeLeft(40 * 60);
+    setTimeLeft(2400);
     timerId.current = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     setIsLose(false);
     setIsWin(false);
