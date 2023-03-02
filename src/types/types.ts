@@ -5,6 +5,7 @@ export enum MaskCell {
   question,
   bomb,
   explosion,
+  markedBomb
 }
 
 export const MaskCellType = {
@@ -14,6 +15,7 @@ export const MaskCellType = {
   [MaskCell.question]: '-51px -50px',
   [MaskCell.bomb]: '-85px -50px',
   [MaskCell.explosion]: '-102px -50px',
+  [MaskCell.markedBomb]: '-118px -50px',
 };
 
 export const timer = [

@@ -22,6 +22,8 @@ function Field() {
   const [isFirstMove, setIsFirstMove] = useState(true);
   const [firstIndex, setFirstIndex] = useState<FirstIndexType>();
 
+  console.log(field);
+
   const timerId = useRef<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(2400);
 
@@ -35,6 +37,10 @@ function Field() {
   function showAllCells() {
     setMask([
       ...mask.map((item, index) => {
+        if (item === 2 && field[index] === -1) {
+          return MaskCell.markedBomb;
+        }
+
         if (field[index] === -1) {
           return MaskCell.bomb;
         }
@@ -119,6 +125,9 @@ function Field() {
           ...mask.map((item, index) => {
             if (index === y * fieldSize + x) {
               return MaskCell.explosion;
+            }
+            if (item === 2 && field[index] === -1) {
+              return MaskCell.markedBomb;
             }
             if (field[index] === -1) {
               return MaskCell.bomb;
