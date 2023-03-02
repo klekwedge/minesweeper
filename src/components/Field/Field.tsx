@@ -4,8 +4,7 @@ import { Flex, Box, Button, Image, Text } from '@chakra-ui/react';
 import { v4 as uuidv4 } from 'uuid';
 import sprite from '/minesweeper-sprites.png';
 import useCreateField from '../../hooks/useCreateField';
-import useTimer from '../../hooks/useTimer';
-import { MaskCell, MaskCellType, numbers } from '../../types/types';
+import { MaskCell, MaskCellType, numbers, timer } from '../../types/types';
 
 function Field() {
   const fieldSize = 16;
@@ -46,11 +45,11 @@ function Field() {
   useEffect(() => {
     if (timeLeft >= 0) {
       const minutes = Math.floor(timeLeft / 60);
-      const newTimerMinutes = [useTimer(Math.floor(minutes / 10)), useTimer(minutes % 10)];
+      const newTimerMinutes = [timer[Math.floor(minutes / 10)], timer[minutes % 10]];
       setMinutesIcon(newTimerMinutes);
 
       const seconds = timeLeft % 60;
-      const newTimerSeconds = [useTimer(Math.floor(seconds / 10)), useTimer(seconds % 10)];
+      const newTimerSeconds = [timer[Math.floor(seconds / 10)], timer[seconds % 10]];
       setSecondsIcon(newTimerSeconds);
     } else {
       if (!isWin) {
@@ -79,30 +78,30 @@ function Field() {
   }, [field, mask]);
 
   const openCell = (x: number, y: number) => {
-    const clearing: [number, number][] = [];
+    const clearingCells: [number, number][] = [];
     const newMaskState = JSON.parse(JSON.stringify(mask));
 
-    function clear(xCoord: number, yCoord: number) {
+    function clearCells(xCoord: number, yCoord: number) {
       if (xCoord >= 0 && xCoord < fieldSize && yCoord >= 0 && yCoord < fieldSize) {
         if (newMaskState[yCoord * fieldSize + xCoord] !== MaskCell.show) {
-          clearing.push([xCoord, yCoord]);
+          clearingCells.push([xCoord, yCoord]);
         }
       }
     }
 
     if (!isLose && !isWin && mask[y * fieldSize + x] !== 1) {
       if (field[y * fieldSize + x] !== -1) {
-        clear(x, y);
+        clearCells(x, y);
 
-        while (clearing.length) {
-          const [xCoord, yCoord] = clearing.pop()!;
+        while (clearingCells.length) {
+          const [xCoord, yCoord] = clearingCells.pop()!;
           newMaskState[yCoord * fieldSize + xCoord] = MaskCell.show;
 
           if (field[yCoord * fieldSize + xCoord] === 0) {
-            clear(xCoord + 1, yCoord);
-            clear(xCoord - 1, yCoord);
-            clear(xCoord, yCoord + 1);
-            clear(xCoord, yCoord - 1);
+            clearCells(xCoord + 1, yCoord);
+            clearCells(xCoord - 1, yCoord);
+            clearCells(xCoord, yCoord + 1);
+            clearCells(xCoord, yCoord - 1);
           }
         }
 
