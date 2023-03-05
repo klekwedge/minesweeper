@@ -22,8 +22,6 @@ function Field() {
   const [isFirstMove, setIsFirstMove] = useState(true);
   const [firstIndex, setFirstIndex] = useState<FirstIndexType>();
 
-  console.log(field);
-
   const timerId = useRef<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(2400);
 
