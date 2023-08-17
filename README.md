@@ -1,5 +1,7 @@
 # Minesweeper
 
+**You can also read this README in [English](https://github.com/klekwedge/minesweeper/blob/main/README.EN.md).**
+
 ## Оглавление
 
 - [Инструкции по развертыванию](#инструкции-по-развертыванию)
